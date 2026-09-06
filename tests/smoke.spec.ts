@@ -13,6 +13,24 @@ test('@smoke health endpoint responds', async ({ request }) => {
   expect(body.sha).toBeTruthy();
 });
 
+test('@smoke claims endpoint responds', async ({ request }) => {
+  const res = await request.get('/api/claims');
+  expect(res.status()).toBe(200);
+  const body = await res.json();
+  expect(body.page).toBe(1);
+  expect(body.totalRecords).toBe(25);
+  expect(body.totalPages).toBe(3);
+  expect(Array.isArray(body.claims)).toBe(true);
+  expect(body.claims.length).toBeLessThanOrEqual(10);
+
+  const page2Res = await request.get('/api/claims?page=2');
+  expect(page2Res.status()).toBe(200);
+  const page2Body = await page2Res.json();
+  expect(page2Body.page).toBe(2);
+  expect(Array.isArray(page2Body.claims)).toBe(true);
+  expect(page2Body.claims.length).toBeLessThanOrEqual(10);
+});
+
 test('@smoke homepage renders', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading')).toBeVisible();

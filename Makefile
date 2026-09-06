@@ -49,9 +49,10 @@ verify:
 		exit 1; \
 	fi; \
 	echo "==> running smoke tests"; \
-	( cd tests && PLAYWRIGHT_BASE_URL=http://localhost:8080 npx playwright test --grep "health endpoint responds|homepage renders" )
-# NOTE (US-0001 G1 decision, Option B): this grep deliberately runs only the two
-# @smoke tests US-0001 owns (homepage renders, health endpoint responds), not the
+	( cd tests && PLAYWRIGHT_BASE_URL=http://localhost:8080 npx playwright test --grep "health endpoint responds|homepage renders|claims endpoint responds" )
+# NOTE (US-0001 G1 decision, Option B; widened by US-0002 G1 decision, Option 1):
+# this grep deliberately runs only the @smoke tests US-0001 and US-0002 own
+# (homepage renders, health endpoint responds, claims endpoint responds), not the
 # full @smoke tag docs/TESTING.md otherwise mandates at every checkpoint. The
 # sign-in-gate and TLS-certificate @smoke tests in tests/smoke.spec.ts belong to
 # US-0006 and are not executed anywhere yet. FOLLOW-UP: US-0006 must widen this

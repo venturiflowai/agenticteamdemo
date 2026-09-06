@@ -1,4 +1,5 @@
 import express, { type Request, type Response } from 'express';
+import { claimsRouter } from './claims.js';
 
 export const app = express();
 
@@ -8,6 +9,8 @@ app.get('/health', (_req: Request, res: Response) => {
     sha: process.env.GIT_SHA ?? 'unknown',
   });
 });
+
+app.use(claimsRouter);
 
 const isMainModule = process.argv[1] === new URL(import.meta.url).pathname;
 
