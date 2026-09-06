@@ -26,6 +26,19 @@ set_fm() { # set_fm <file> <key> <value>
   ' "$2" > "$2.tmp" && mv "$2.tmp" "$2"
 }
 
+ensure_label() { # ensure_label <name> <color> <description>
+  gh label create "$1" --repo "$REPO" --color "$2" --description "$3" --force >/dev/null 2>&1 || true
+}
+
+if [ "$DRY" != "1" ]; then
+  ensure_label "feature"      "5319e7" "Parent feature tracked under docs/feature/"
+  ensure_label "story"        "0e8a16" "Story tracked under docs/intent/"
+  ensure_label "story:user"   "1d76db" "User-facing story"
+  ensure_label "story:enabler" "fbca04" "Enabler story"
+  ensure_label "intent:draft" "d4c5f9" "Intent not yet ready to dispatch"
+  ensure_label "intent:ready" "c2e0c6" "Intent ready to dispatch"
+fi
+
 changed=0
 
 # --- features first, so stories can reference the parent ---
