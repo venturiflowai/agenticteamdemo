@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+          git checkout "${{ github.event.pull_request.head.sha }}"
+
+      - name: Set up Node 22
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+
+      - name: Install Playwright browsers
+        working-directory: tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: make build
+        run: make build
+
+      - name: make lint
+        run: make lint
+
+      - name: make test
+        run: make test
+
+      # NOTE (US-0001 G1 decision, Option B): make verify's Playwright grep is
+      # deliberately filtered to the two @smoke tests this story owns, not the
+      # full @smoke tag. See the note above the smoke test invocation in the
+      # Makefile. FOLLOW-UP: US-0006 must widen it back to "@smoke" once it
+      # implements the sign-in gate and TLS check.
+      - name: make verify
+        run: make verify
+
+      # NOTE: an earlier draft of this workflow uploaded the Playwright HTML
+      # report via actions/upload-artifact@v4. The venturiflowai org restricts
+      # GitHub Actions to actions it owns, so that step (and actions/checkout,
+      # actions/setup-node above) would fail with "action ... is not allowed".
+      # Dropped rather than replaced: report/trace upload is not required by
+      # any US-0001 acceptance criterion, and there is no equivalent that
+      # needs no third-party action. On failure, `make verify`'s own output
+      # (captured above) already prints the container logs.
