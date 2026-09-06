@@ -7,12 +7,12 @@ intent: docs/intent/US-0001-repository-and-delivery-scaffold.md
 
 ## Note before the plan
 
-This plan contains one unresolved fork (see step 9 of Order of work) caused by a conflict
-between this story's own "Out of scope" (no Google sign-in) and an assertion already
-present in the pre-existing `tests/smoke.spec.ts` file, which this plan is not free to
-delete or weaken. Per the planner's rules, both options are written out and the plan does
-not choose between them. A human must pick one before implementation proceeds past that
-step.
+This plan originally contained one unresolved fork (step 9 of Order of work), caused by a
+conflict between this story's own "Out of scope" (no Google sign-in) and an assertion
+already present in the pre-existing `tests/smoke.spec.ts` file, which this plan is not
+free to delete or weaken. A human has reviewed both options in the G1 pull request and
+chosen **Option B**: filter the Playwright invocation to this story's own two tests by
+name. Step 9 below is updated to reflect that decision.
 
 ## Files that change
 
@@ -139,42 +139,16 @@ not as undeclared scope.
    health JSON `sha` field check) without touching the other two existing tests in that
    file or their tags.
 
-9. **Stop and decide before continuing**: which of the two options below governs the
-   Playwright invocation inside the `Makefile`'s `verify` target and inside
-   `.github/workflows/ci.yml`. Both are reasonable readings of AC6 ("runs the smoke
-   tests"); they produce different, mutually exclusive `Makefile`/workflow content, and a
-   different agent should not guess between them.
-
-   - **Option A — run the full `@smoke` tag.** Invoke
-     `npx playwright test --grep @smoke`, matching the checkpoint-1 row of
-     `docs/TESTING.md` exactly and requiring no special-casing, ever. Consequence: this
-     also runs the pre-existing `@smoke unauthenticated request is not served content`
-     test, which asserts a `data-testid="sign-in"` element is visible on the
-     unauthenticated homepage. Nothing in this story builds a sign-in gate (it is this
-     story's own "Out of scope"), so that test has no element to find and fails every
-     time. Because `make verify` must exit non-zero on any failure (AC6) and the CI
-     workflow must fail the check when `make verify` fails (AC9), this option means the
-     scaffold story's own pull request cannot reach a passing check under its own
-     acceptance criteria, which contradicts the story's stated purpose ("one command that
-     starts everything, proves it is healthy"). Choosing this option effectively defers
-     this story's completion until sign-in exists.
-   - **Option B — filter to this story's own tests by name.** Invoke
-     `npx playwright test --grep "health endpoint responds|homepage renders"`, running
-     only the two tests this story is actually responsible for and leaving the sign-in-gate
-     and TLS-certificate tests unexecuted anywhere for now. Consequence: `make verify` and
-     CI can go green on this story's own scope, matching AC6/AC7/AC9 literally, but it
-     deviates from `docs/TESTING.md`'s stated rule of one unfiltered `@smoke` grep at every
-     checkpoint, and it requires a later story (US-0006, which owns the sign-in gate and
-     the TLS check per its own acceptance criteria) to widen this same grep back to the
-     full `@smoke` tag. That follow-up must be tracked explicitly (for example, as a line
-     in that story's own plan) or the two pre-existing tests will silently keep not
-     running past this story.
-
-   The tradeoff: Option A is the literal, no-special-casing reading but makes this
-   story's own acceptance criteria unsatisfiable by construction until a story that has
-   not been dispatched yet is also done. Option B lets this story stand on its own but
-   introduces a filter that must be remembered and later widened. This plan does not pick
-   one; do not proceed past this step until a human has chosen.
+9. **Resolved by human decision at G1: Option B.** Invoke
+   `npx playwright test --grep "health endpoint responds|homepage renders"` inside the
+   `Makefile`'s `verify` target and inside `.github/workflows/ci.yml`, running only the
+   two tests this story is actually responsible for. The sign-in-gate and
+   TLS-certificate tests in `tests/smoke.spec.ts` are left unexecuted anywhere for now;
+   they are not edited or removed. This deviates from `docs/TESTING.md`'s stated rule of
+   one unfiltered `@smoke` grep at every checkpoint, so the implementer must add a line to
+   `docs/TESTING.md` (or a tracked follow-up note) recording that US-0006, which owns the
+   sign-in gate and the TLS check per its own acceptance criteria, must widen this grep
+   back to the full `@smoke` tag once those exist. Do not let this filter go unrecorded.
 
 10. Once step 9 is resolved, finish the `Makefile` and write
     `.github/workflows/ci.yml` to run `make build`, `make lint`, `make test`, and
@@ -206,9 +180,8 @@ not as undeclared scope.
 | 9 | CI runs build, test, lint, verify on every PR and fails the check on failure | This story's own pull request, observed running `.github/workflows/ci.yml` | The "fails when any of them fails" half is proven by the workflow's default behavior (no `continue-on-error`, no `\|\| true`) on review, not by an executed failing run kept as a permanent test. |
 | 10 | `CLAUDE.md` exists, is under one page, documents commands/conventions/the no-test-editing rule | File existence is checked trivially. "Documents X, Y, Z" and "under one page" are read and judged by a human at G1/G2 review; there is no automated test for prose completeness or page length as literally worded. | Not fully machine-testable as written; flagged rather than faked. Proceeding on the same basis the rest of this framework already uses human review for (G0–G3), rather than treating this alone as grounds to halt the plan. |
 
-Row 9 of Order of work (the `@smoke` grep scope) governs which specific invocation
-appears in the `Makefile`/CI for rows 6 and 9 above; the mapping in this table holds
-under either option.
+Row 9 of Order of work (the `@smoke` grep scope, resolved to Option B) governs the
+specific invocation that appears in the `Makefile`/CI for rows 6 and 9 above.
 
 ## Risks
 
@@ -230,10 +203,10 @@ under either option.
 - `.claude/hooks/protect-intents.sh` blocks writes to `docs/intent/` and `docs/feature/`;
   nothing in this plan touches those paths, but an implementer must not "fix" the
   `US-0001` intent's front matter (for example, its `issue:` field) even incidentally.
-- The unresolved fork in Order of work step 9 is itself a risk if skipped rather than
-  decided: an implementer who picks a side unilaterally removes the human's ability to
-  choose at G1, which is the failure mode the escalation rule in
-  `docs/AGENT-TEAM.md` exists to prevent.
+- Option B (chosen at G1) means the sign-in-gate and TLS-certificate tests in
+  `tests/smoke.spec.ts` run nowhere until a later story widens the grep. If that
+  follow-up is dropped, those two tests stay silently unexecuted indefinitely; the
+  implementer must record the follow-up (see step 9) so it is not lost.
 
 ## Deviations from plan
 
