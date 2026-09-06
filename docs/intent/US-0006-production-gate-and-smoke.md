@@ -4,7 +4,7 @@ title: Production release gate and smoke tests
 feature: F-001
 type: enabler
 depends_on: [US-0005]
-issue:
+issue: 10
 status: draft
 ---
 

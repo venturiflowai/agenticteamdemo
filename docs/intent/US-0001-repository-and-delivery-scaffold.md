@@ -4,7 +4,7 @@ title: Repository and delivery scaffold
 feature: F-001
 type: enabler
 depends_on: []
-issue:
+issue: 6
 status: ready
 ---
 

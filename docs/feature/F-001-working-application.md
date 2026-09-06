@@ -1,7 +1,7 @@
 ---
 id: F-001
 title: Working application delivered through the agent pipeline
-issue:
+issue: 4
 stories: [US-0001, US-0002, US-0003, US-0004, US-0005, US-0006]
 ---
 

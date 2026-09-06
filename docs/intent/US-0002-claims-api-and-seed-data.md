@@ -4,7 +4,7 @@ title: Workers' compensation claims API and seed data
 feature: F-001
 type: user
 depends_on: [US-0001]
-issue:
+issue: 7
 status: draft
 ---
 
