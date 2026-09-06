@@ -117,7 +117,7 @@ function ClaimsDashboard() {
           <thead>
             <tr>
               {COLUMNS.map((column) => (
-                <th key={column.key}>
+                <th key={column.key} scope="col">
                   <button type="button" onClick={() => handleHeaderClick(column.key)}>
                     {column.label}
                   </button>

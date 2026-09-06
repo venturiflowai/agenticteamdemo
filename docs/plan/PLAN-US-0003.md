@@ -213,3 +213,15 @@ All 9 acceptance criteria have a named test. No criterion is flagged as untestab
   remains outstanding in this session; this PR's own GitHub Actions run (on
   infrastructure with a working Docker daemon, same as US-0001's and US-0002's PRs) is
   the actual proof.
+- That CI run found a real bug this plan's own Vitest-vs-Playwright split was designed to
+  catch: the new `@smoke claims dashboard renders claims table` test failed against the
+  real compose stack in real Chromium — `getByRole('columnheader')` resolved to zero
+  elements inside the `<table>`, even though the identical markup passed 10/10 in the
+  jsdom-based `ClaimsDashboard.test.tsx`. Root-caused by rendering a minimal repro of the
+  same `<thead><tr><th>` structure through Playwright directly: a `<th>` with no `scope`
+  attribute gets no implicit `columnheader` role in real Chromium, while jsdom's role
+  computation (used by Testing Library) is more lenient and assigns it regardless. Fixed
+  by adding `scope="col"` to each `<th>` in `app/src/ClaimsDashboard.tsx` (a one-line,
+  standard-HTML fix, not a test change). Re-ran `npm run lint`/`npm run test` for `app/`
+  after the fix (still 11/11 passing); the corrected commit is what this PR's CI re-run
+  verifies.
