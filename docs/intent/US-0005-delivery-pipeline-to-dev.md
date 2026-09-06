@@ -4,7 +4,7 @@ title: Delivery pipeline to the dev namespace
 feature: F-001
 type: enabler
 depends_on: [US-0001]
-issue:
+issue: 9
 status: draft
 ---
 

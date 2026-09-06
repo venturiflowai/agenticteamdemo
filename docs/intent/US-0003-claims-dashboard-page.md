@@ -4,7 +4,7 @@ title: Claims dashboard page
 feature: F-001
 type: user
 depends_on: [US-0002]
-issue:
+issue: 8
 status: draft
 ---
 

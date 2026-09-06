@@ -94,6 +94,14 @@ if [ "$changed" = "1" ] && [ "$DRY" != "1" ]; then
   git config user.email "sdlc-sync@users.noreply.github.com"
   git add docs/
   git commit -m "chore: record issue numbers on intent front matter"
-  git push
+  base_branch="$(git rev-parse --abbrev-ref HEAD)"
+  sync_branch="sync-issues/record-numbers-$(date +%Y%m%d%H%M%S)"
+  git push origin "HEAD:$sync_branch"
+  gh pr create --repo "$REPO" --base "$base_branch" --head "$sync_branch" \
+    --title "chore: record issue numbers on intent front matter" \
+    --body "Automated by the sync-issues workflow. Records the GitHub issue numbers
+created in this run into the front matter of the affected feature/story files. Merge to
+close the loop; rerunning the workflow before this merges will recreate duplicate issues
+for the same stories."
 fi
 echo "sync complete"
