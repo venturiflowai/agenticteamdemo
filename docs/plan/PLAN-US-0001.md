@@ -210,4 +210,21 @@ specific invocation that appears in the `Makefile`/CI for rows 6 and 9 above.
 
 ## Deviations from plan
 
-(empty at planning time)
+- Step 9's required follow-up note was recorded as a comment directly in `Makefile` and
+  `.github/workflows/ci.yml` (stating that US-0006 must widen the Playwright grep back to
+  the full `@smoke` tag once it lands), rather than in `docs/TESTING.md`. `docs/TESTING.md`
+  is not in this plan's Files that change list, and editing it would have violated the
+  "do not edit files outside the Files that change list" rule.
+- Step 12 (run `make build`, `make lint`, `make test`, `make verify` locally before
+  opening the pull request) could not be completed as specified. `npm run build`,
+  `npm run lint`, and `npm run test` were run directly (not via `make`) for both `app/`
+  and `api/` and all passed. The containerized `make` targets could not be validated in
+  this session: every Docker Hub image pull (`node:22-alpine`, `docker/dockerfile:1`)
+  returns 403 Forbidden. An independent `verifier` run confirmed this is an egress-policy
+  denial for `production.cloudfront.docker.com` in this session's proxy, not a defect in
+  the `Makefile`, `docker-compose.yml`, or the Dockerfiles. Per this plan's own Risks
+  section, this is exactly the anticipated "Docker-in-Docker or outbound registry access
+  may not be available" risk. Per instruction, this was reported rather than worked
+  around (no alternate registry, no base-image substitution, no CA/proxy injection into
+  the build). Containerized verification remains outstanding and should be re-run in an
+  environment with Docker Hub access before this story is considered fully proven.
