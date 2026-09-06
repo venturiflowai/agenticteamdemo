@@ -45,15 +45,34 @@ Run it with `DRY_RUN=1` first if you want to see what it would create.
 
 ## Step 3. Dispatch US-0001
 
-Open a new session and give it the intent file path. Ask for a plan first, not code. The
-plan names the files it will create, the order it will work in, and the tests that prove
-each acceptance criterion.
+Open a new session on the repository and run:
 
-Read the plan before it writes anything. This is G1. Look for criteria with no
-corresponding test, and for files it plans to create that the intent did not ask for.
+```
+/plan docs/intent/US-0001-repository-and-delivery-scaffold.md
+```
 
-Then let it implement, and let CI run build, test, lint, and verify. Review the diff and
-merge. That is G2.
+The planner writes `docs/plan/PLAN-US-0001.md` and opens a pull request. It writes no
+code. Read the plan. This is G1, and the two things to look for are an acceptance
+criterion with no test mapped to it, and files it plans to create that the intent did not
+ask for. Merge when you are satisfied.
+
+Then run:
+
+```
+/implement docs/plan/PLAN-US-0001.md
+```
+
+The implementer executes the plan, the verifier runs `make verify` and reports, and a pull
+request opens with the verifier output pasted into the body. On that pull request the
+plan-compliance and security-review agents post separately.
+
+Read plan-compliance first, specifically its third list: what is in the diff but not in the
+plan. That list is where scope creep and unrecorded decisions live. Merge when it is clean.
+That is G2.
+
+Note that US-0001 is the one story where the verifier has nothing to run until the
+implementer has built `make verify` itself. That is expected. From US-0002 onward the
+verifier runs against a command that already exists.
 
 ## Step 4. What you will learn from story one
 
