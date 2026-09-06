@@ -49,12 +49,14 @@ verify:
 		exit 1; \
 	fi; \
 	echo "==> running smoke tests"; \
-	( cd tests && PLAYWRIGHT_BASE_URL=http://localhost:8080 npx playwright test --grep "health endpoint responds|homepage renders|claims endpoint responds" )
-# NOTE (US-0001 G1 decision, Option B; widened by US-0002 G1 decision, Option 1):
-# this grep deliberately runs only the @smoke tests US-0001 and US-0002 own
-# (homepage renders, health endpoint responds, claims endpoint responds), not the
-# full @smoke tag docs/TESTING.md otherwise mandates at every checkpoint. The
-# sign-in-gate and TLS-certificate @smoke tests in tests/smoke.spec.ts belong to
-# US-0006 and are not executed anywhere yet. FOLLOW-UP: US-0006 must widen this
-# grep (here and in .github/workflows/ci.yml) back to the unfiltered "@smoke" tag
-# once it implements the sign-in gate and TLS check. Do not let this drop.
+	( cd tests && PLAYWRIGHT_BASE_URL=http://localhost:8080 npx playwright test --grep "health endpoint responds|homepage renders|claims endpoint responds|claims dashboard renders claims table" )
+# NOTE (US-0001 G1 decision, Option B; widened by US-0002 G1 decision, Option 1;
+# widened again by US-0003 G1 decision, following the same precedent): this grep
+# deliberately runs only the @smoke tests US-0001, US-0002, and US-0003 own
+# (homepage renders, health endpoint responds, claims endpoint responds, claims
+# dashboard renders claims table), not the full @smoke tag docs/TESTING.md
+# otherwise mandates at every checkpoint. The sign-in-gate and TLS-certificate
+# @smoke tests in tests/smoke.spec.ts belong to US-0006 and are not executed
+# anywhere yet. FOLLOW-UP: US-0006 must widen this grep (here and in
+# .github/workflows/ci.yml) back to the unfiltered "@smoke" tag once it
+# implements the sign-in gate and TLS check. Do not let this drop.

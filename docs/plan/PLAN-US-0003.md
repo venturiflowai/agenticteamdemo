@@ -201,3 +201,27 @@ All 9 acceptance criteria have a named test. No criterion is flagged as untestab
 
 ## Deviations from plan
 
+- Step 9 (run `make lint`/`test`/`verify` locally before opening the PR) could not be
+  completed as specified: the Docker daemon is not running in this session (`docker info`/
+  `docker ps -a` both report it unreachable; no systemd/init to start it), the same class
+  of environmental limitation `docs/plan/PLAN-US-0001.md` and `docs/plan/PLAN-US-0002.md`
+  both hit. Confirmed independently by a `verifier` run immediately after implementation.
+  `npm run lint`/`npm run test`/`npx tsc --noEmit` were run directly for `app/` (11 tests
+  passing) and `api/` (8 tests passing, confirming it is unaffected) as a substitute
+  signal; `npx playwright test --list` confirmed `tests/smoke.spec.ts` still parses
+  correctly with all 6 tests listed, including the new one. Containerized verification
+  remains outstanding in this session; this PR's own GitHub Actions run (on
+  infrastructure with a working Docker daemon, same as US-0001's and US-0002's PRs) is
+  the actual proof.
+- That CI run found a real bug this plan's own Vitest-vs-Playwright split was designed to
+  catch: the new `@smoke claims dashboard renders claims table` test failed against the
+  real compose stack in real Chromium — `getByRole('columnheader')` resolved to zero
+  elements inside the `<table>`, even though the identical markup passed 10/10 in the
+  jsdom-based `ClaimsDashboard.test.tsx`. Root-caused by rendering a minimal repro of the
+  same `<thead><tr><th>` structure through Playwright directly: a `<th>` with no `scope`
+  attribute gets no implicit `columnheader` role in real Chromium, while jsdom's role
+  computation (used by Testing Library) is more lenient and assigns it regardless. Fixed
+  by adding `scope="col"` to each `<th>` in `app/src/ClaimsDashboard.tsx` (a one-line,
+  standard-HTML fix, not a test change). Re-ran `npm run lint`/`npm run test` for `app/`
+  after the fix (still 11/11 passing); the corrected commit is what this PR's CI re-run
+  verifies.
