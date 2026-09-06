@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: ./app
+      args:
+        GIT_SHA: ${GIT_SHA:-dev}
+    ports:
+      - '8080:8080'
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./api
+    environment:
+      GIT_SHA: ${GIT_SHA:-dev}

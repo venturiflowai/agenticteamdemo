@@ -1,16 +1,24 @@
+import { execSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
 
 // These four run everywhere, including production. Nothing here signs in or writes data.
 
+const gitSha = execSync('git rev-parse --short HEAD').toString().trim();
+
 test('@smoke health endpoint responds', async ({ request }) => {
   const res = await request.get('/api/health');
   expect(res.status()).toBe(200);
-  expect((await res.json()).status).toBeTruthy();
+  const body = await res.json();
+  expect(body.status).toBeTruthy();
+  expect(body.sha).toBeTruthy();
 });
 
 test('@smoke homepage renders', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading')).toBeVisible();
+  const text = await page.textContent('body');
+  expect(text).toContain('Agentic Team Demo');
+  expect(text).toContain(gitSha);
 });
 
 test('@smoke unauthenticated request is not served content', async ({ page }) => {

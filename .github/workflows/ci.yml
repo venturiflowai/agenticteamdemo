@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright browsers
+        working-directory: tests
+        run: npx --yes playwright install --with-deps chromium
+
+      - name: make build
+        run: make build
+
+      - name: make lint
+        run: make lint
+
+      - name: make test
+        run: make test
+
+      # NOTE (US-0001 G1 decision, Option B): make verify's Playwright grep is
+      # deliberately filtered to the two @smoke tests this story owns, not the
+      # full @smoke tag. See the note above the smoke test invocation in the
+      # Makefile. FOLLOW-UP: US-0006 must widen it back to "@smoke" once it
+      # implements the sign-in gate and TLS check.
+      - name: make verify
+        run: make verify
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            tests/playwright-report/
+            tests/test-results/
+          retention-days: 14
