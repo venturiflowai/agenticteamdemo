@@ -1,0 +1,22 @@
+{
+  "name": "agenticteamdemo",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "app (frontend, proxies /api)",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "docker --version && node --version",
+  "remoteUser": "vscode"
+}
