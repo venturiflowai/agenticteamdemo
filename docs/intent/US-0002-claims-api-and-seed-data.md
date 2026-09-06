@@ -35,6 +35,8 @@ controls. The seed dataset contains enough sample claims to demonstrate three pa
 5. `GET /api/claims?page=2` and `GET /api/claims?page=3` each return the correct
    subsequent slice of records (10, then 5), with no claim repeated across pages.
 6. `GET /api/claims` with no `page` query parameter behaves as `page=1`.
+7. `GET /api/claims` with a `page` number greater than `totalPages` returns HTTP 200 with
+   an empty `claims` array, and correct `page`, `totalPages`, and `totalRecords` values.
 
 ## Non-functional constraints
 - Read-only endpoint. No create, update, or delete in this story.
@@ -47,5 +49,4 @@ Filtering or searching claims by status or any other field. Any endpoint other t
 API (that is US-0003).
 
 ## Open questions
-What should `GET /api/claims` return when `page` is beyond `totalPages` — an empty
-`claims` array, or an error? Not yet decided.
+None.

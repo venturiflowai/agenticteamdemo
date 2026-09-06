@@ -34,6 +34,8 @@ can sort the claims currently on screen by clicking a column header.
 7. Clicking the same column header again reverses the sort to descending order.
 8. Sorting reorders only the rows on screen; it does not fetch data from the API and does
    not affect other pages.
+9. A sort does not persist across page navigation: after moving to another page and back,
+   the page displays in the API's default order until a header is clicked again.
 
 ## Non-functional constraints
 - Sorting is client-side, applied only to the 10 (or fewer) rows already on screen. It
@@ -46,6 +48,4 @@ Filtering or searching claims. Sorting across all claims rather than the current
 (would require API support). Specific visual design or branding.
 
 ## Open questions
-Does a column sort persist when the user navigates to another page and back (e.g. sort by
-Status, go to page 2, return to page 1), or does each newly fetched page reset to the
-API's default order until a header is clicked again? Not yet decided.
+None.
