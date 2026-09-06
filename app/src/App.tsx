@@ -1,3 +1,5 @@
+import ClaimsDashboard from './ClaimsDashboard';
+
 export const APP_NAME = 'Agentic Team Demo';
 
 function App() {
@@ -9,6 +11,7 @@ function App() {
       <p>
         Build <code>{sha}</code>
       </p>
+      <ClaimsDashboard />
     </main>
   );
 }

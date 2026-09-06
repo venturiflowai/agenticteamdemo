@@ -39,6 +39,27 @@ test('@smoke homepage renders', async ({ page }) => {
   expect(text).toContain(gitSha);
 });
 
+test('@smoke claims dashboard renders claims table', async ({ page }) => {
+  await page.goto('/');
+  const table = page.getByRole('table');
+  await expect(table).toBeVisible();
+
+  const headers = table.getByRole('columnheader');
+  await expect(headers).toHaveText([
+    'Claim ID',
+    'Claimant Name',
+    'Employer',
+    'Date of Injury',
+    'Status',
+  ]);
+
+  const rows = table.locator('tbody tr');
+  await expect(rows).toHaveCount(10);
+
+  await expect(page.getByRole('button', { name: 'Previous' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Next' })).toBeEnabled();
+});
+
 test('@smoke unauthenticated request is not served content', async ({ page }) => {
   // Proves the auth gate is in force without passing through it. This is the assertion
   // that earns production smoke its keep.

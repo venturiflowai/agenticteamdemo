@@ -35,11 +35,11 @@ jobs:
         run: make test
 
       # NOTE (US-0001 G1 decision, Option B; widened by US-0002 G1 decision,
-      # Option 1): make verify's Playwright grep is deliberately filtered to the
-      # @smoke tests US-0001 and US-0002 own, not the full @smoke tag. See the
-      # note above the smoke test invocation in the Makefile. FOLLOW-UP: US-0006
-      # must widen it back to "@smoke" once it implements the sign-in gate and
-      # TLS check.
+      # Option 1; widened again by US-0003 G1 decision): make verify's Playwright
+      # grep is deliberately filtered to the @smoke tests US-0001, US-0002, and
+      # US-0003 own, not the full @smoke tag. See the note above the smoke test
+      # invocation in the Makefile. FOLLOW-UP: US-0006 must widen it back to
+      # "@smoke" once it implements the sign-in gate and TLS check.
       - name: make verify
         run: make verify
 
