@@ -228,3 +228,22 @@ specific invocation that appears in the `Makefile`/CI for rows 6 and 9 above.
   around (no alternate registry, no base-image substitution, no CA/proxy injection into
   the build). Containerized verification remains outstanding and should be re-run in an
   environment with Docker Hub access before this story is considered fully proven.
+- Two post-implementation fixes were made directly on `build/US-0001` after the initial
+  push, once the PR's own CI run (`.github/workflows/ci.yml`) surfaced them:
+  - `ci.yml` used `actions/checkout@v4`, `actions/setup-node@v4`, and
+    `actions/upload-artifact@v4`. The venturiflowai org restricts GitHub Actions to
+    actions it owns, so all three failed with "action ... is not allowed" and the
+    workflow never got past setup (`conclusion: startup_failure`). `checkout` and
+    `setup-node` were replaced with a plain `git clone`/`git checkout` and a NodeSource
+    install, matching the pattern already used in `scripts/sync-issues.sh`'s workflow.
+    `upload-artifact` was dropped rather than replaced (report/trace upload is not an
+    acceptance criterion for this story, and there is no non-Action equivalent worth the
+    added complexity); this is noted in `ci.yml` itself.
+  - `tests/` (pre-existing, not created by this story) had `tests/playwright.config.ts`
+    importing `@playwright/test` with no `tests/package.json` declaring it, so
+    `npx playwright test` failed with `Cannot find module '@playwright/test'` regardless
+    of the Docker issue above. Added a minimal `tests/package.json` (and the resulting
+    `tests/package-lock.json`) pinning `@playwright/test` to the version already
+    pre-installed in this environment (1.56.1). This file is outside this plan's
+    original "Files that change" list, since `tests/` belongs to no single story, but
+    without it no story's `make verify` can ever run its Playwright step.
