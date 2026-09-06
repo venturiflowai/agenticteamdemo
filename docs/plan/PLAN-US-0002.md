@@ -137,4 +137,18 @@ All seven acceptance criteria have a named test.
 
 ## Deviations from plan
 
-None yet — this section is for the implementer to fill in.
+- Step 8 (run `make lint`/`test`/`verify` locally before opening the PR) could not be
+  completed as specified, for an environmental reason this plan already anticipated (see
+  its own caveat referencing `docs/plan/PLAN-US-0001.md`). `npm run lint`/`npm run test`/
+  `npm run build` were run directly for both `api/` and `app/` and passed; the compiled
+  `dist/` output was manually inspected to confirm `tsc`'s `resolveJsonModule` copies
+  `claims.seed.json` into `dist/data/`, so `api/Dockerfile` needed no change. `make lint`,
+  `make test`, and `make verify` themselves could not run: in this session the Docker
+  daemon would not start at all (`ulimit: error setting limit (Operation not permitted)`
+  during implementation; confirmed independently by a `verifier` run immediately after,
+  which found the daemon simply unreachable). This is a different symptom of the same
+  class of sandbox limitation US-0001 hit (there, the daemon started but Docker Hub pulls
+  returned 403). Per instruction, this was reported rather than worked around.
+  Containerized verification remains outstanding in this session; this PR's own GitHub
+  Actions run (on infrastructure with a working Docker daemon and normal registry access,
+  same as it was for US-0001's PR) is the actual proof.
